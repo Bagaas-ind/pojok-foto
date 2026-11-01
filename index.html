@@ -7,14 +7,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Playfair+Display:wght@700;900&family=Pinyon+Script&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-:root{--bg:#FAF7F2;--ink:#1C1713;--mute:#7B7068;--card:#fff;--line:#E6DED3;--acc:#C44A14;--accink:#fff;--mat:#F1E7D8;
-box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--bg:#FAF7F2;--ink:#1C1713;--mute:#7B7068;--card:#fff;--line:#E6DED3;--acc:#C44A14;--accink:#fff;--mat:#F1E7D8}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17120E;--ink:#F5EEE6;--mute:#A89A8D;--card:#221B16;--line:#3A2F27;--acc:#E8703A;--accink:#1C1713;--mat:#2B221B;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#17120E;--ink:#F5EEE6;--mute:#A89A8D;--card:#221B16;--line:#3A2F27;--acc:#E8703A;--accink:#1C1713;--mat:#2B221B;color-scheme:dark}
 *{box-sizing:border-box}[hidden]{display:none!important}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 "DM Sans",system-ui,sans-serif}
-.app{max-width:1080px;margin:0 auto;padding:18px 20px 44px}
+html,body{overflow-x:hidden}
+.app{max-width:1080px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top,0px)) 20px calc(44px + env(safe-area-inset-bottom,0px))}
 nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:34px}
 .logo{font:italic 400 24px "Instrument Serif",Georgia,serif;letter-spacing:-.01em}
 .badge{font:500 12px "DM Sans",sans-serif;border:1.5px solid var(--ink);border-radius:99px;padding:5px 12px}
@@ -23,6 +23,7 @@ h1 em{color:var(--acc)}
 .lead{color:var(--mute);margin:0 0 6px;max-width:44ch;font-size:15px}
 h2{font:700 13px "DM Sans",sans-serif;margin:0 0 10px;color:var(--ink)}
 .grid{display:grid;gap:34px}
+.grid > *, .res > * { min-width: 0; }
 @media(min-width:900px){.grid{grid-template-columns:minmax(0,1fr) 400px;gap:64px;align-items:start}.wrap{position:sticky;top:20px;order:2}}
 .wrap{position:relative;padding:18px 10px}
 .wrap::before{content:"";position:absolute;inset:0 18px 0 18px;background:var(--acc);border-radius:6px;transform:rotate(3deg);opacity:.95}
@@ -66,9 +67,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .foot{text-align:center;color:var(--mute);font-size:14px;margin:50px 0 0}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:10px;font-size:14px;max-width:min(92vw,420px);z-index:9}
 .film{display:flex;gap:12px;overflow-x:auto;padding:4px 2px 12px;scroll-snap-type:x proximity}.film .sw{flex:0 0 auto;width:72px;scroll-snap-align:start}.film .sw canvas{border-radius:4px}
-html,body{overflow-x:hidden}
 @media(max-width:899px){
- .app{padding:12px 16px 24px}
+ .app{padding:calc(12px + env(safe-area-inset-top,0px)) 16px calc(24px + env(safe-area-inset-bottom,0px))}
  nav{margin-bottom:14px}
  .grid,.res{gap:18px}
  .wrap{padding:10px 8px;max-width:270px;margin:0 auto;width:100%}
