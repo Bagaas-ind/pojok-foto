@@ -13,8 +13,7 @@
 *{box-sizing:border-box}[hidden]{display:none!important}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 "DM Sans",system-ui,sans-serif}
-html,body{overflow-x:hidden}
-.app{max-width:1080px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top,0px)) 20px calc(44px + env(safe-area-inset-bottom,0px))}
+.app{max-width:1080px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top,0px)) 20px calc(44px + env(safe-area-inset-bottom,0px));overflow-x:clip}
 nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:34px}
 .logo{font:italic 400 24px "Instrument Serif",Georgia,serif;letter-spacing:-.01em}
 .badge{font:500 12px "DM Sans",sans-serif;border:1.5px solid var(--ink);border-radius:99px;padding:5px 12px}
@@ -66,7 +65,10 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .steps b{font:italic 400 34px/1 "Instrument Serif",serif;color:var(--acc);display:block}.steps p{margin:4px 0 0;color:var(--mute);font-size:14px}.steps strong{font-size:15px}
 .foot{text-align:center;color:var(--mute);font-size:14px;margin:50px 0 0}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:10px;font-size:14px;max-width:min(92vw,420px);z-index:9}
-.film{display:flex;gap:12px;overflow-x:auto;padding:4px 2px 12px;scroll-snap-type:x proximity}.film .sw{flex:0 0 auto;width:72px;scroll-snap-align:start}.film .sw canvas{border-radius:4px}
+.film{display:flex;gap:12px;overflow-x:auto;padding:4px 2px 12px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+.film .sw{flex:0 0 auto;width:72px;scroll-snap-align:start}.film .sw canvas{border-radius:4px}
+
+/* Perbaikan Tampilan HP: Tombol melayang dihilangkan agar tidak menutupi layar */
 @media(max-width:899px){
  .app{padding:calc(12px + env(safe-area-inset-top,0px)) 16px calc(24px + env(safe-area-inset-bottom,0px))}
  nav{margin-bottom:14px}
@@ -76,7 +78,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
  .stage{padding:10px}
  .stage canvas{max-height:42vh}
  #outcv{max-height:56vh}
- .stack{grid-template-columns:1fr 1fr;position:sticky;bottom:0;z-index:5;margin:0 -16px;padding:12px 16px calc(10px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--bg) 75%,transparent)}
+ .stack{grid-template-columns:1fr 1fr;margin-top:20px;padding-bottom:20px;}
  #s-setup .stack{grid-template-columns:1.5fr 1fr}
  .res .stack .cta{grid-column:1/-1}
  .cam{padding:16px 12px;border-radius:16px}
@@ -304,7 +306,19 @@ $('#sml').onclick=()=>{const i=S.items[S.sel];if(i){i.s*=.87;drawResult()}};
 $('#del').onclick=()=>{if(S.sel>=0){S.items.splice(S.sel,1);S.sel=-1;drawResult()}};
 const oc=$('#outcv');let drag=null;
 const pt=e=>{const r=oc.getBoundingClientRect();return[(e.clientX-r.left)*oc.width/r.width,(e.clientY-r.top)*oc.height/r.height]};
-oc.onpointerdown=e=>{const [x,y]=pt(e);let hit=-1;for(let j=S.items.length-1;j>=0;j--){const it=S.items[j];if(Math.abs(x-it.x)<(it.w||it.s)/2+14&&Math.abs(y-it.y)<(it.h||it.s)/2+14){hit=j;break}}S.sel=hit;drag=hit<0?null:[x-S.items[hit].x,y-S.items[hit].y];oc.setPointerCapture(e.pointerId);drawResult()};
+oc.onpointerdown=e=>{
+ const [x,y]=pt(e);let hit=-1;
+ for(let j=S.items.length-1;j>=0;j--){
+  const it=S.items[j];
+  if(Math.abs(x-it.x)<(it.w||it.s)/2+14&&Math.abs(y-it.y)<(it.h||it.s)/2+14){hit=j;break}
+ }
+ S.sel=hit;
+ if(hit>=0){
+  drag=[x-S.items[hit].x,y-S.items[hit].y];
+  oc.setPointerCapture(e.pointerId);
+ }else{drag=null}
+ drawResult()
+};
 oc.onpointermove=e=>{if(!drag)return;const [x,y]=pt(e),it=S.items[S.sel];it.x=x-drag[0];it.y=y-drag[1];drawResult()};
 oc.onpointerup=()=>drag=null;
 
