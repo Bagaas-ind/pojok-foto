@@ -58,7 +58,13 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .steps b{font:italic 400 34px/1 "Instrument Serif",serif;color:var(--acc);display:block}.steps p{margin:4px 0 0;color:var(--mute);font-size:14px}.steps strong{font-size:15px}
 .foot{text-align:center;color:var(--mute);font-size:14px;margin:50px 0 0}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:10px;font-size:14px;max-width:min(92vw,420px);z-index:9}
-.film{display:flex;gap:12px;overflow-x:auto;padding:4px 2px 12px;scroll-snap-type:x proximity}.film .sw{flex:0 0 auto;width:72px;scroll-snap-align:start}.film .sw canvas{border-radius:4px}
+
+/* --- PERBAIKAN FILM & GESER (SLIDE) --- */
+.film{display:flex;gap:12px;overflow-x:auto;padding:4px 2px 12px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}
+.film::-webkit-scrollbar { display: none; }
+.film .sw{flex:0 0 auto;width:72px;scroll-snap-align:start}
+.film .sw canvas{border-radius:4px}
+
 html,body{overflow-x:hidden}
 @media(max-width:899px){
  .app{padding:12px 16px 24px}
@@ -74,6 +80,11 @@ html,body{overflow-x:hidden}
  .res .stack .cta{grid-column:1/-1}
  .cam{padding:16px 12px;border-radius:16px}
  .vf{outline-width:6px}
+
+ /* PERBAIKAN: Bikin class .row bisa digeser (slide) di HP */
+ .row{flex-wrap:nowrap;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}
+ .row::-webkit-scrollbar{display:none}
+ .row>*{flex:0 0 auto}
 }
 @supports (height:1dvh){.vf{width:min(100%,calc(56dvh*var(--ar)))}}
 

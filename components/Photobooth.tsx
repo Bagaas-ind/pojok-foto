@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { S, LAYOUTS, BGS, FILTERS, PAL, L, render, toCell, exp, glyph } from "@/lib/booth";
+import { S, LAYOUTS, BGS, FILTERS, L, render, toCell, exp } from "@/lib/booth";
 
 type Screen = "setup" | "cam" | "res";
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-const STICKERS = ["heart", "star", "sparkle", "flower"];
 
 function Icon({ l }: { l: any }) {
   const r = useRef<HTMLCanvasElement>(null);
@@ -21,16 +20,6 @@ function Icon({ l }: { l: any }) {
     }
   }, [l]);
   return <canvas ref={r} width={26} height={36} />;
-}
-
-function Glyph({ n }: { n: string }) {
-  const r = useRef<HTMLCanvasElement>(null);
-  useEffect(() => {
-    const c = r.current!.getContext("2d")!;
-    c.translate(16, 16);
-    glyph(c, n, 28, "#C44A14");
-  }, [n]);
-  return <canvas ref={r} width={32} height={32} />;
 }
 
 function Thumb({ b, on, k, onPick }: { b: any; on: boolean; k: string; onPick: () => void }) {
@@ -68,14 +57,12 @@ export default function Photobooth() {
   const [flash, setFlash] = useState(0);
   const [copies, setCopies] = useState(1);
   const [msg, setMsg] = useState("");
-  const [txt, setTxt] = useState("");
 
   const prev = useRef<HTMLCanvasElement>(null);
   const out = useRef<HTMLCanvasElement>(null);
   const video = useRef<HTMLVideoElement>(null);
   const file = useRef<HTMLInputElement>(null);
   const stream = useRef<MediaStream | null>(null);
-  const drag = useRef<number[] | null>(null);
 
   const toast = (m: string) => {
     setMsg(m);
@@ -95,7 +82,6 @@ export default function Photobooth() {
     if (screen === "setup" && prev.current) render(prev.current, [], false);
     if (screen === "res" && out.current) {
       render(out.current, S.shots, true);
-      out.current.style.touchAction = S.sel >= 0 ? "none" : "pan-y";
     }
   });
 
@@ -211,45 +197,6 @@ export default function Photobooth() {
     }
   }
 
-  // stiker dan teks
-  const add = (o: any) => {
-    const l = L();
-    o.x = l.W / 2;
-    o.y = l.H / 2;
-    o.col = PAL[S.pc++ % PAL.length];
-    if (o.k === "tag") o.r = -0.08;
-    S.items.push(o);
-    S.sel = S.items.length - 1;
-    bump();
-  };
-  const sel = () => S.items[S.sel];
-  const pt = (e: React.PointerEvent) => {
-    const c = out.current!, r = c.getBoundingClientRect();
-    return [((e.clientX - r.left) * c.width) / r.width, ((e.clientY - r.top) * c.height) / r.height];
-  };
-  const down = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    const [x, y] = pt(e);
-    let hit = -1;
-    for (let j = S.items.length - 1; j >= 0; j--) {
-      const it = S.items[j];
-      if (Math.abs(x - it.x) < (it.w || it.s) / 2 + 14 && Math.abs(y - it.y) < (it.h || it.s) / 2 + 14) {
-        hit = j;
-        break;
-      }
-    }
-    S.sel = hit;
-    drag.current = hit < 0 ? null : [x - S.items[hit].x, y - S.items[hit].y];
-    e.currentTarget.setPointerCapture(e.pointerId);
-    bump();
-  };
-  const move = (e: React.PointerEvent) => {
-    if (!drag.current) return;
-    const [x, y] = pt(e), it = sel();
-    it.x = x - drag.current[0];
-    it.y = y - drag.current[1];
-    bump();
-  };
-
   const thumbKey = S.layout + "|" + commit;
   const bgList = (
     <div className="film">
@@ -263,7 +210,6 @@ export default function Photobooth() {
 
   return (
     <>
-
       {screen === "setup" && (
         <section>
           <div className="grid">
@@ -277,7 +223,7 @@ export default function Photobooth() {
                 Photobooth <em>retro</em> di HP kamu.
               </h1>
               <p className="lead">
-                Pilih bingkai, jepret empat kali, hias dengan stiker, lalu simpan atau cetak. Fotomu diproses di perangkat dan tidak diunggah.
+                Pilih bingkai, jepret empat kali, lalu simpan atau cetak. Fotomu diproses di perangkat dan tidak diunggah.
               </p>
               <div className="sec">
                 <h2>Gaya foto</h2>
@@ -335,7 +281,7 @@ export default function Photobooth() {
             <div className="steps">
               <div><b>1</b><strong>Pilih gaya</strong><p>Tata letak, bingkai, dan filter ala film.</p></div>
               <div><b>2</b><strong>Jepret</strong><p>Hitung mundur otomatis, atau ambil dari galeri.</p></div>
-              <div><b>3</b><strong>Hias dan simpan</strong><p>Tambah stiker, lalu simpan atau cetak PDF.</p></div>
+              <div><b>3</b><strong>Simpan</strong><p>Simpan fotomu atau cetak langsung jadi PDF.</p></div>
             </div>
           </div>
         </section>
@@ -366,35 +312,13 @@ export default function Photobooth() {
           <div className="res">
             <div className="wrap">
               <div className="stage">
-                <canvas id="outcv" ref={out} aria-label="Hasil photobooth, stiker bisa digeser" onPointerDown={down} onPointerMove={move} onPointerUp={() => (drag.current = null)} />
+                <canvas id="outcv" ref={out} aria-label="Hasil photobooth" />
               </div>
             </div>
             <div>
-              <h1>Hias dulu, <em>baru</em> simpan.</h1>
-              <p className="hint">Ketuk stiker, lalu geser di foto untuk mengatur posisinya.</p>
-              <div className="sec">
-                <h2>Stiker</h2>
-                <div className="row">
-                  {STICKERS.map((n) => (
-                    <button key={n} className="chip" aria-label={"Stiker " + n} onClick={() => add({ k: "g", v: n, s: 170 })}><Glyph n={n} /></button>
-                  ))}
-                  {["Photobooth", String(new Date().getFullYear()), "Edisi spesial"].map((v) => (
-                    <button key={v} className="chip" onClick={() => add({ k: "tag", v, s: 96 })}>{v}</button>
-                  ))}
-                </div>
-                <div className="row" style={{ marginTop: 8 }}>
-                  <button className="chip" onClick={() => { const i = sel(); if (i) { i.s *= 1.15; bump(); } }}>Perbesar</button>
-                  <button className="chip" onClick={() => { const i = sel(); if (i) { i.s *= 0.87; bump(); } }}>Perkecil</button>
-                  <button className="chip" onClick={() => { if (S.sel >= 0) { S.items.splice(S.sel, 1); S.sel = -1; bump(); } }}>Hapus</button>
-                </div>
-              </div>
-              <div className="sec">
-                <h2><label htmlFor="txt">Teks bebas</label></h2>
-                <div className="row" style={{ flexWrap: "nowrap" }}>
-                  <input type="text" id="txt" maxLength={16} placeholder="Tulis teks" value={txt} onChange={(e) => setTxt(e.target.value)} />
-                  <button className="chip" onClick={() => { const v = txt.trim(); if (v) { add({ k: "t", v, s: 110 }); setTxt(""); } }}>Tambah</button>
-                </div>
-              </div>
+              <h1>Foto siap, <em>simpan</em> sekarang!</h1>
+              <p className="hint">Kamu bisa mengganti template di bawah ini jika ingin suasana yang berbeda.</p>
+              
               <div className="sec">
                 <h2>Ganti template</h2>
                 {bgList}
@@ -416,7 +340,7 @@ export default function Photobooth() {
               <div className="stack">
                 <button className="cta" onClick={save}>Simpan ke galeri</button>
                 <button className="ghost" onClick={pdf}>Unduh PDF</button>
-                <button className="ghost" onClick={() => { S.shots = []; S.items = []; S.sel = -1; go("setup"); }}>Foto ulang</button>
+                <button className="ghost" onClick={() => { S.shots = []; go("setup"); }}>Foto ulang</button>
               </div>
             </div>
           </div>
