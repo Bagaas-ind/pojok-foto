@@ -76,3 +76,36 @@ html,body{overflow-x:hidden}
  .vf{outline-width:6px}
 }
 @supports (height:1dvh){.vf{width:min(100%,calc(56dvh*var(--ar)))}}
+
+/* ---- situs multi-halaman ---- */
+nav{flex-wrap:wrap;gap:6px 16px}
+.logo{text-decoration:none;color:var(--ink)}
+.navlinks{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;max-width:100%}
+.navlinks a{font:500 13px "DM Sans",sans-serif;color:var(--mute);text-decoration:none;padding:8px 10px;border-radius:8px;white-space:nowrap}
+.navlinks a[aria-current=page]{color:var(--ink);background:var(--mat)}
+@media(max-width:700px){.navlinks{order:3;width:100%}}
+a.cta,a.ghost{display:flex;align-items:center;justify-content:center;text-decoration:none}
+.hero{display:grid;gap:24px;align-items:center}
+@media(min-width:900px){.hero{grid-template-columns:1fr 1fr;gap:56px}}
+.heroBtns{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:380px;margin-top:20px}
+.show{display:flex;gap:12px;justify-content:center;padding:14px 4px;overflow:hidden}
+.show canvas{border-radius:4px;box-shadow:0 14px 30px -14px rgba(28,23,19,.55)}
+.show canvas:nth-child(odd){transform:rotate(-3deg)}.show canvas:nth-child(even){transform:rotate(3deg) translateY(14px)}
+.cards{display:grid;gap:10px;margin-top:36px}
+@media(min-width:700px){.cards{grid-template-columns:repeat(4,1fr)}}
+.card{display:grid;gap:4px;padding:16px;border:1.5px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);text-decoration:none}
+.card strong{font-size:15px}.card span{font-size:13px;color:var(--mute)}
+.card:hover{border-color:var(--ink)}
+.faq{margin-top:40px}.faq h3{font:400 26px/1 "Instrument Serif",serif;margin:0 0 12px}
+.faq details{border-top:1px solid var(--line);padding:12px 0}.faq summary{cursor:pointer;font-weight:500;font-size:15px}
+.faq p{margin:8px 0 0;color:var(--mute);font-size:14px}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:18px}
+.frm{appearance:none;border:0;background:none;color:var(--ink);cursor:pointer;display:grid;gap:8px;justify-items:center;font:500 13px "DM Sans",sans-serif}
+.frm canvas{border-radius:4px;box-shadow:0 10px 24px -14px rgba(28,23,19,.6);transition:transform .15s}
+.frm:hover canvas{transform:translateY(-3px)}
+.colors{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.field{display:flex;align-items:center;justify-content:space-between;gap:10px;font:500 13px "DM Sans",sans-serif;border:1.5px solid var(--line);background:var(--card);border-radius:10px;padding:6px 10px}
+.field input{width:40px;height:30px;border:0;background:none;padding:0}
+input[type=range]{width:100%;accent-color:var(--acc)}
+.posts{display:grid;gap:22px;margin-top:20px;max-width:620px}
+.posts h2{font:400 24px/1.1 "Instrument Serif",serif;margin:0 0 6px}.posts p{margin:0;color:var(--mute);font-size:15px}

@@ -262,11 +262,7 @@ export default function Photobooth() {
   const ar = l.cells(0)[2] / l.cells(0)[3];
 
   return (
-    <main className="app">
-      <nav>
-        <div className="logo">Pojok Foto</div>
-        <span className="badge">gratis, tanpa aplikasi</span>
-      </nav>
+    <>
 
       {screen === "setup" && (
         <section>
@@ -427,8 +423,7 @@ export default function Photobooth() {
         </section>
       )}
 
-      <p className="foot">Dibuat oleh @saroka</p>
       {msg && <div className="toast">{msg}</div>}
-    </main>
+    </>
   );
 }
