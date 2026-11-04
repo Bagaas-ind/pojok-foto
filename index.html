@@ -7,9 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Playfair+Display:wght@700;900&family=Pinyon+Script&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-:root{--bg:#FAF7F2;--ink:#1C1713;--mute:#7B7068;--card:#fff;--line:#E6DED3;--acc:#C44A14;--accink:#fff;--mat:#F1E7D8}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17120E;--ink:#F5EEE6;--mute:#A89A8D;--card:#221B16;--line:#3A2F27;--acc:#E8703A;--accink:#1C1713;--mat:#2B221B;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#17120E;--ink:#F5EEE6;--mute:#A89A8D;--card:#221B16;--line:#3A2F27;--acc:#E8703A;--accink:#1C1713;--mat:#2B221B;color-scheme:dark}
+:root{--bg:#FAF7F2;--ink:#1C1713;--mute:#7B7068;--card:#fff;--line:#E6DED3;--acc:#A65E4E;--accink:#fff;--mat:#F1E7D8}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17120E;--ink:#F5EEE6;--mute:#A89A8D;--card:#221B16;--line:#3A2F27;--acc:#C9806F;--accink:#1C1713;--mat:#2B221B;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#17120E;--ink:#F5EEE6;--mute:#A89A8D;--card:#221B16;--line:#3A2F27;--acc:#C9806F;--accink:#1C1713;--mat:#2B221B;color-scheme:dark}
 *{box-sizing:border-box}[hidden]{display:none!important}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 "DM Sans",system-ui,sans-serif}
@@ -97,12 +97,12 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       <div class="stage"><canvas id="prev" aria-label="Pratinjau hasil foto"></canvas></div></div>
     <div>
       <h1>Photobooth <em>retro</em> di HP kamu.</h1>
-      <p class="lead">Pilih bingkai, jepret empat kali, hias dengan stiker, lalu simpan atau cetak. Fotomu diproses di perangkat dan tidak diunggah.</p>
+      <p class="lead">Pilih bingkai, jepret empat kali, hias dengan teks elegan, lalu simpan atau cetak. Fotomu diproses di perangkat dan tidak diunggah.</p>
       <div class="sec"><h2>Gaya foto</h2><div class="row" id="layouts"></div></div>
       <div class="sec"><h2>Template bingkai</h2><div class="film" id="bgs"></div></div>
       <div class="sec"><h2>Filter</h2><div class="row" id="filters"></div></div>
       <div class="sec"><h2>Hitung mundur</h2><div class="row" id="timers"></div></div>
-      <div class="sec"><h2><label for="cap">Judul bingkai</label></h2><input type="text" id="cap" maxlength="22" value="Photobooth" placeholder="Judul bingkai" autocomplete="off"><h2 style="margin-top:14px"><label for="sub">Tulisan kecil</label></h2><input type="text" id="sub" maxlength="30" value="" placeholder="mis. Edisi 2026" autocomplete="off"></div>
+      <div class="sec"><h2><label for="cap">Judul bingkai</label></h2><input type="text" id="cap" maxlength="22" value="SAROKA" placeholder="Judul bingkai" autocomplete="off"><h2 style="margin-top:14px"><label for="sub">Tulisan kecil</label></h2><input type="text" id="sub" maxlength="30" value="" placeholder="mis. Edisi 2026" autocomplete="off"></div>
       <div class="stack">
         <button class="cta" id="start">Masuk ke bilik</button>
         <button class="ghost" id="pick">Pilih dari galeri</button>
@@ -113,7 +113,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   <div class="how"><h3>Tiga langkah, selesai.</h3><div class="steps">
     <div><b>1</b><strong>Pilih gaya</strong><p>Tata letak, bingkai, dan filter ala film.</p></div>
     <div><b>2</b><strong>Jepret</strong><p>Hitung mundur otomatis, atau ambil dari galeri.</p></div>
-    <div><b>3</b><strong>Hias dan simpan</strong><p>Tambah stiker, lalu simpan ke galeri atau cetak PDF.</p></div></div></div>
+    <div><b>3</b><strong>Hias dan simpan</strong><p>Tambah teks kustom, lalu simpan ke galeri atau cetak PDF.</p></div></div></div>
 </section>
 
 <section id="s-cam" hidden>
@@ -130,13 +130,27 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 
 <section id="s-res" hidden>
   <div class="res">
-    <div class="wrap"><div class="stage"><canvas id="outcv" aria-label="Hasil photobooth, stiker bisa digeser"></canvas></div></div>
+    <div class="wrap"><div class="stage"><canvas id="outcv" aria-label="Hasil photobooth, teks bisa digeser"></canvas></div></div>
     <div>
       <h1>Hias dulu, <em>baru</em> simpan.</h1>
-      <p class="hint">Ketuk stiker, lalu geser di foto untuk mengatur posisinya.</p>
-      <div class="sec"><h2>Stiker</h2><div class="row" id="stk"></div>
-        <div class="row" style="margin-top:8px"><button class="chip" id="big">Perbesar</button><button class="chip" id="sml">Perkecil</button><button class="chip" id="del">Hapus</button></div></div>
-      <div class="sec"><h2><label for="txt">Teks bebas</label></h2><div class="row" style="flex-wrap:nowrap"><input type="text" id="txt" maxlength="16" placeholder="Tulis teks"><button class="chip" id="addt">Tambah</button></div></div>
+      <p class="hint">Tambahkan teks atau inisial, lalu geser di foto untuk mengatur posisinya.</p>
+      
+      <!-- BAGIAN STIKER DIROMBAK JADI LEBIH ELEGAN -->
+      <div class="sec"><h2>Teks Kustom</h2>
+        <div class="row" style="flex-wrap:nowrap">
+          <input type="text" id="txt" maxlength="20" placeholder="Nama / Inisial">
+          <button class="chip" id="addt" style="white-space:nowrap">Tambah</button>
+        </div>
+      </div>
+      
+      <div class="sec"><h2>Atur Teks Terpilih</h2>
+        <div class="row">
+          <button class="chip" id="big">Perbesar</button>
+          <button class="chip" id="sml">Perkecil</button>
+          <button class="chip" id="del">Hapus</button>
+        </div>
+      </div>
+
       <div class="sec"><h2>Ganti template</h2><div class="film" id="bgs2"></div></div>
       <div class="sec"><h2><label for="sheet">Hasil cetak</label></h2><select id="sheet"><option value="1" selected>2 strip berdampingan (cocok cetak 4×6)</option><option value="0">1 strip saja</option></select></div>
       <div class="sec"><h2><label for="copies">Lembar di satu halaman A4</label></h2>
@@ -224,7 +238,7 @@ function drawItems(c,ui){S.items.forEach((it,i)=>{c.save();c.translate(it.x,it.y
  it.w=w;it.h=h;if(ui&&i===S.sel){c.strokeStyle='#C44A14';c.lineWidth=4;c.setLineDash([12,9]);c.strokeRect(-w/2-10,-h/2-10,w+20,h+20)}c.restore()})}
 function bow(c,x,y){c.save();c.translate(x,y);c.rotate(-.3);c.fillStyle='#C9707A';[-1,1].forEach(d=>{c.beginPath();c.moveTo(0,0);c.bezierCurveTo(d*34,-30,d*58,-10,d*50,8);c.bezierCurveTo(d*58,26,d*34,26,0,0);c.fill()});c.fillStyle='#A9525C';c.beginPath();c.arc(0,0,9,0,7);c.fill();c.restore()}
 function render(cv,shots,ui,tpl,noItems){
- const l=L(),bg=tpl||B(),T={t:$('#cap').value.trim()||'Photobooth',s:$('#sub').value.trim(),d:new Date()};
+ const l=L(),bg=tpl||B(),T={t:$('#cap').value.trim()||'SAROKA',s:$('#sub').value.trim(),d:new Date()};
  cv.width=l.W;cv.height=l.H;const c=cv.getContext('2d');bg.paint(c,l.W,l.H);(bg.head||dHead)(c,l,T,bg);
  for(let i=0;i<l.n;i++){const [x,y,w,h]=l.cells(i),f=bg.fr||{p:10,r:0};
   c.save();c.shadowColor='rgba(0,0,0,.22)';c.shadowBlur=14;c.shadowOffsetY=5;c.fillStyle=f.c||'#fff';rr(c,x-f.p,y-f.p,w+2*f.p,h+2*f.p,f.r?f.r+f.p/2:0);c.fill();c.restore();
@@ -237,7 +251,7 @@ function render(cv,shots,ui,tpl,noItems){
  if(!noItems)drawItems(c,ui)}
 function thumb(paint,w,h,sc){const k=document.createElement('canvas');k.width=w;k.height=h;const c=k.getContext('2d');c.scale(sc,sc);paint(c,w/sc,h/sc);return k}
 function chip(parent,label,sub,pressed,fn,icon){const b=document.createElement('button');b.className='chip';b.setAttribute('aria-pressed',pressed);if(icon)b.append(icon);const t=document.createElement('div');t.textContent=label;if(sub){const s=document.createElement('small');s.textContent=sub;t.append(s)}b.append(t);b.onclick=fn;parent.append(b)}
-function icon(l){const k=document.createElement('canvas');k.width=26;k.height=36;const c=k.getContext('2d'),s=Math.min(22/l.W,32/l.H);c.fillStyle='#C44A14';const ox=(26-l.W*s)/2,oy=(36-l.H*s)/2;for(let i=0;i<l.n;i++){const [x,y,w,h]=l.cells(i);c.fillRect(ox+x*s,oy+y*s,w*s,h*s)}return k}
+function icon(l){const k=document.createElement('canvas');k.width=26;k.height=36;const c=k.getContext('2d'),s=Math.min(22/l.W,32/l.H);c.fillStyle='#A65E4E';const ox=(26-l.W*s)/2,oy=(36-l.H*s)/2;for(let i=0;i<l.n;i++){const [x,y,w,h]=l.cells(i);c.fillRect(ox+x*s,oy+y*s,w*s,h*s)}return k}
 function buildBgs(el){el.innerHTML='';el.className='film';const l=L(),tw=64,th=Math.round(tw*l.H/l.W);BGS.forEach(b=>{const x=document.createElement('button');x.className='sw';x.setAttribute('aria-pressed',b.id===S.bg);x.setAttribute('aria-label','Template '+b.name);const k=document.createElement('canvas'),big=document.createElement('canvas');render(big,[],false,b,true);k.width=tw*2;k.height=th*2;k.style.width=tw+'px';k.style.height=th+'px';k.getContext('2d').drawImage(big,0,0,k.width,k.height);x.append(k);const s=document.createElement('span');s.textContent=b.name;x.append(s);x.onclick=()=>{S.bg=b.id;buildUI();if(!$('#s-res').hidden)drawResult()};el.append(x)})}
 function buildUI(){
  const a=$('#layouts');a.innerHTML='';Object.entries(LAYOUTS).forEach(([id,l])=>chip(a,l.name,l.n+' foto',id===S.layout,()=>{S.layout=id;S.items=[];buildUI()},icon(l)));
@@ -298,8 +312,8 @@ function pdf(){
  catch(e){toast('PDF gagal dibuat. Periksa koneksi internet lalu muat ulang halaman.')}
 }
 function add(o){o.x=L().W/2;o.y=L().H/2;o.col=PAL[pc++%PAL.length];if(o.k==='tag')o.r=-.08;S.items.push(o);S.sel=S.items.length-1;drawResult()}
-['heart','star','sparkle','flower'].forEach(n=>{const b=document.createElement('button');b.className='chip';b.setAttribute('aria-label','Stiker '+n);const k=document.createElement('canvas');k.width=k.height=32;const c=k.getContext('2d');c.translate(16,16);glyph(c,n,28,'#C44A14');b.append(k);b.onclick=()=>add({k:'g',v:n,s:170});$('#stk').append(b)});
-['Photobooth',String(new Date().getFullYear()),'Edisi spesial'].forEach(v=>{const b=document.createElement('button');b.className='chip';b.textContent=v;b.onclick=()=>add({k:'tag',v,s:96});$('#stk').append(b)});
+
+// TOMBOL STIKER LAMA DIHAPUS, DIGANTI TEKS KUSTOM YANG LEBIH ELEGAN
 $('#addt').onclick=()=>{const v=$('#txt').value.trim();if(v){add({k:'t',v,s:110});$('#txt').value=''}};
 $('#big').onclick=()=>{const i=S.items[S.sel];if(i){i.s*=1.15;drawResult()}};
 $('#sml').onclick=()=>{const i=S.items[S.sel];if(i){i.s*=.87;drawResult()}};
@@ -337,4 +351,4 @@ $('#file').onchange=async e=>{
 $('#sub').value='Edisi '+new Date().getFullYear();buildUI();document.fonts&&Promise.all(['900 40px "Playfair Display"','italic 400 40px "Instrument Serif"','400 40px "Pinyon Script"','700 20px "DM Sans"'].map(f=>document.fonts.load(f))).then(buildUI,buildUI);
 </script>
 </body>
-</html>
+ </html>
