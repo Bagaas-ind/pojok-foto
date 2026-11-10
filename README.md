@@ -65,3 +65,5 @@ pojok-foto/
 ├── next.config.ts        # Konfigurasi Next.js
 ├── package.json          # Dependensi & skrip proyek
 └── tsconfig.json         # Konfigurasi TypeScript
+
+badge Quickdraw
