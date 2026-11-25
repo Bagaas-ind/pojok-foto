@@ -92,7 +92,10 @@ export default function Photobooth() {
     set({ sub: "Edisi " + new Date().getFullYear() });
     const f = ['900 40px "Playfair Display"', 'italic 400 40px "Instrument Serif"', '400 40px "Pinyon Script"', '700 20px "DM Sans"'];
     Promise.all(f.map((x) => document.fonts.load(x))).then(() => setCommit((c) => c + 1), () => {});
-    return stop;
+    return () => {
+      runId.current += 1;
+      stop();
+    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // pasang aliran kamera ke <video> setelah layar kamera tampil
