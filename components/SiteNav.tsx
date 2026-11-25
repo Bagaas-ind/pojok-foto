@@ -7,17 +7,16 @@ const LINKS = [
   ["/filter", "Filter Cam"],
   ["/frames", "Galeri Frame"],
   ["/build", "Buat Bingkai"],
-  ["/blog", "Blog"],
 ];
 
 export default function SiteNav() {
   const p = usePathname() || "/";
   return (
-    <nav>
-      <Link href="/" className="logo">Pojok Foto</Link>
+    <nav aria-label="Navigasi utama">
+      <Link href="/" className="logo" aria-label="Pojok Foto, halaman utama">Pojok Foto</Link>
       <div className="navlinks">
         {LINKS.map(([h, t]) => (
-          <Link key={h} href={h} aria-current={p.startsWith(h) ? "page" : undefined}>{t}</Link>
+          <Link key={h} href={h} aria-current={p === h || p.startsWith(h + "/") ? "page" : undefined}>{t}</Link>
         ))}
       </div>
     </nav>

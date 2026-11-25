@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title">
+  <title id="title">Pojok Foto</title>
+  <rect x="12" y="12" width="136" height="136" rx="34" fill="#C44A14"/>
+  <rect x="39" y="28" width="82" height="104" rx="9" fill="#FAF7F2"/>
+  <rect x="47" y="37" width="66" height="54" rx="4" fill="#E9D9B8"/>
+  <circle cx="80" cy="64" r="15" fill="#C44A14" opacity=".9"/>
+  <path d="M47 85l19-18 13 12 10-9 24 21H47z" fill="#6B4F3A"/>
+  <rect x="48" y="99" width="64" height="5" rx="2.5" fill="#C44A14"/>
+  <rect x="59" y="110" width="42" height="4" rx="2" fill="#C8B9A5"/>
+</svg>
