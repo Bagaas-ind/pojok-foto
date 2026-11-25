@@ -59,6 +59,7 @@ export default function Photobooth() {
   const [msg, setMsg] = useState("");
   const [importing, setImporting] = useState(false);
   const [cameraVersion, setCameraVersion] = useState(0);
+  const [cameraReady, setCameraReady] = useState(false);
   const runId = useRef(0);
 
   const prev = useRef<HTMLCanvasElement>(null);
@@ -109,6 +110,7 @@ export default function Photobooth() {
   }, [screen, cameraVersion]);
 
   async function openCam() {
+    setCameraReady(false);
     if (!window.isSecureContext) {
       toast("Kamera memerlukan koneksi HTTPS atau localhost. Kamu tetap bisa memilih foto dari galeri.");
       return;
@@ -144,7 +146,7 @@ export default function Photobooth() {
   async function run() {
     const v = video.current;
     if (busy || !v) return;
-    if (v.readyState < HTMLMediaElement.HAVE_CURRENT_DATA || !v.videoWidth || !v.videoHeight) {
+    if (!cameraReady || v.readyState < HTMLMediaElement.HAVE_CURRENT_DATA || !v.videoWidth || !v.videoHeight) {
       toast("Kamera belum siap. Tunggu sampai pratinjau muncul, lalu coba lagi.");
       return;
     }
@@ -229,8 +231,9 @@ export default function Photobooth() {
   }
 
   function save() {
-    exp().toBlob(async (b: Blob | null) => {
-      if (!b) return;
+    try {
+      exp().toBlob(async (b: Blob | null) => {
+      if (!b) { toast("Gagal menyiapkan gambar. Coba simpan sekali lagi."); return; }
       const f = new File([b], "pojok-foto.png", { type: "image/png" });
       if (navigator.canShare && navigator.canShare({ files: [f] })) {
         try {
@@ -249,7 +252,10 @@ export default function Photobooth() {
       a.remove();
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
       toast("Jika unduhan tidak dimulai, gunakan browser biasa dan coba lagi.");
-    }, "image/png");
+      }, "image/png");
+    } catch {
+      toast("Gagal menyiapkan gambar. Coba muat ulang halaman.");
+    }
   }
 
   async function pdf() {
@@ -364,7 +370,8 @@ export default function Photobooth() {
         <section>
           <div className="cam">
             <div className="vf" style={{ ["--ar" as any]: ar }}>
-              <video ref={video} playsInline muted style={{ transform: S.facing === "user" ? "scaleX(-1)" : "none", filter: FILTERS[S.filter].f }} />
+              <video ref={video} playsInline muted onLoadedMetadata={() => setCameraReady(true)} onCanPlay={() => setCameraReady(true)} onError={() => { setCameraReady(false); toast("Pratinjau kamera terputus. Kembali lalu buka kamera lagi."); }} style={{ transform: S.facing === "user" ? "scaleX(-1)" : "none", filter: FILTERS[S.filter].f }} />
+              {!cameraReady && <div className="hint" role="status">Menyiapkan kamera...</div>}
               <div className="cd">{cd}</div>
               <div key={flash} className={flash ? "flash go" : "flash"} />
             </div>
@@ -372,7 +379,7 @@ export default function Photobooth() {
               {Array.from({ length: l.n }, (_, i) => <b key={i} className={i < done ? "on" : ""} />)}
             </div>
             <div className="camctl">
-              <button className="cta" disabled={busy} onClick={run}>Mulai hitung mundur</button>
+              <button className="cta" disabled={busy || !cameraReady} onClick={run}>Mulai hitung mundur</button>
               <button className="ghost" disabled={busy} onClick={() => { set({ facing: S.facing === "user" ? "environment" : "user" }); openCam(); }}>Putar kamera</button>
               <button className="ghost" disabled={busy} onClick={() => { stop(); go("setup"); }}>Kembali</button>
             </div>
