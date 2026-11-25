@@ -58,6 +58,7 @@ export default function Photobooth() {
   const [copies, setCopies] = useState(1);
   const [msg, setMsg] = useState("");
   const [importing, setImporting] = useState(false);
+  const [cameraVersion, setCameraVersion] = useState(0);
   const runId = useRef(0);
 
   const prev = useRef<HTMLCanvasElement>(null);
@@ -105,7 +106,7 @@ export default function Photobooth() {
       v.srcObject = stream.current;
       v.play().catch(() => {});
     }
-  }, [screen]);
+  }, [screen, cameraVersion]);
 
   async function openCam() {
     if (!window.isSecureContext) {
@@ -124,6 +125,7 @@ export default function Photobooth() {
       });
       stream.current = nextStream;
       setDone(0);
+      setCameraVersion((version) => version + 1);
       go("cam");
     } catch (error) {
       stop();
