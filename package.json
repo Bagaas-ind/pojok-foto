@@ -22,5 +22,9 @@
   },
   "engines": {
     "node": ">=20.9.0"
-  }
+  },
+  "name": "pojok-foto",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Photobooth retro berbasis web dengan kamera, galeri, filter, frame kustom, dan ekspor PNG/PDF."
 }
