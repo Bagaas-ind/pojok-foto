@@ -60,6 +60,7 @@ export default function Photobooth() {
   const [importing, setImporting] = useState(false);
   const [cameraVersion, setCameraVersion] = useState(0);
   const [cameraReady, setCameraReady] = useState(false);
+  const [cameraOpening, setCameraOpening] = useState(false);
   const runId = useRef(0);
 
   const prev = useRef<HTMLCanvasElement>(null);
@@ -110,6 +111,7 @@ export default function Photobooth() {
   }, [screen, cameraVersion]);
 
   async function openCam() {
+    if (cameraOpening) return;
     setCameraReady(false);
     if (!window.isSecureContext) {
       toast("Kamera memerlukan koneksi HTTPS atau localhost. Kamu tetap bisa memilih foto dari galeri.");
@@ -119,6 +121,7 @@ export default function Photobooth() {
       toast("Browser ini tidak mendukung akses kamera. Coba browser versi terbaru atau pilih foto dari galeri.");
       return;
     }
+    setCameraOpening(true);
     try {
       stop();
       const nextStream = await navigator.mediaDevices.getUserMedia({
@@ -144,6 +147,8 @@ export default function Photobooth() {
             ? "Kamera sedang digunakan aplikasi lain. Tutup aplikasi tersebut lalu coba lagi."
             : "Kamera tidak bisa dibuka. Periksa izin kamera atau gunakan foto dari galeri.";
       toast(message);
+    } finally {
+      setCameraOpening(false);
     }
   }
 
@@ -353,7 +358,7 @@ export default function Photobooth() {
                 <input type="text" id="sub" maxLength={30} value={S.sub} placeholder="mis. Edisi 2026" autoComplete="off" onChange={(e) => set({ sub: e.target.value })} onBlur={() => setCommit((c) => c + 1)} />
               </div>
               <div className="stack">
-                <button className="cta" onClick={openCam}>Masuk ke bilik</button>
+                <button className="cta" disabled={cameraOpening} onClick={openCam}>{cameraOpening ? "Membuka kamera..." : "Masuk ke bilik"}</button>
                 <button className="ghost" disabled={importing} onClick={() => file.current?.click()}>{importing ? "Membaca foto..." : "Pilih dari galeri"}</button>
                 <input ref={file} type="file" accept="image/*" multiple hidden onChange={onFile} />
               </div>
