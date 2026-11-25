@@ -49,7 +49,7 @@ Untuk pengalaman kamera terbaik, buka melalui browser modern dan izinkan akses k
 
 ### Persyaratan
 
-- Node.js 20 atau lebih baru
+- Node.js 20.9 atau lebih baru
 - npm
 - Browser modern
 
