@@ -57,6 +57,8 @@ export default function Photobooth() {
   const [flash, setFlash] = useState(0);
   const [copies, setCopies] = useState(1);
   const [msg, setMsg] = useState("");
+  const [importing, setImporting] = useState(false);
+  const runId = useRef(0);
 
   const prev = useRef<HTMLCanvasElement>(null);
   const out = useRef<HTMLCanvasElement>(null);
@@ -66,7 +68,7 @@ export default function Photobooth() {
 
   const toast = (m: string) => {
     setMsg(m);
-    setTimeout(() => setMsg(""), 4200);
+    window.setTimeout(() => setMsg((current) => current === m ? "" : current), 4200);
   };
   const go = (s: Screen) => {
     setScreen(s);
@@ -103,58 +105,122 @@ export default function Photobooth() {
   }, [screen]);
 
   async function openCam() {
+    if (!window.isSecureContext) {
+      toast("Kamera memerlukan koneksi HTTPS atau localhost. Kamu tetap bisa memilih foto dari galeri.");
+      return;
+    }
+    if (!navigator.mediaDevices?.getUserMedia) {
+      toast("Browser ini tidak mendukung akses kamera. Coba browser versi terbaru atau pilih foto dari galeri.");
+      return;
+    }
     try {
       stop();
-      stream.current = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: S.facing, width: { ideal: 1280 }, height: { ideal: 960 } },
+      const nextStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: S.facing }, width: { ideal: 1280 }, height: { ideal: 960 } },
         audio: false,
       });
+      stream.current = nextStream;
       setDone(0);
       go("cam");
-    } catch {
-      toast("Kamera tidak bisa dibuka. Izinkan akses kamera di browser, atau pilih foto dari galeri.");
+    } catch (error) {
+      stop();
+      const name = error instanceof DOMException ? error.name : "";
+      const message = name === "NotAllowedError"
+        ? "Izin kamera ditolak. Aktifkan izin kamera untuk situs ini di pengaturan browser."
+        : name === "NotFoundError"
+          ? "Kamera tidak ditemukan pada perangkat ini."
+          : name === "NotReadableError"
+            ? "Kamera sedang digunakan aplikasi lain. Tutup aplikasi tersebut lalu coba lagi."
+            : "Kamera tidak bisa dibuka. Periksa izin kamera atau gunakan foto dari galeri.";
+      toast(message);
     }
   }
 
   async function run() {
     const v = video.current;
     if (busy || !v) return;
+    if (v.readyState < HTMLMediaElement.HAVE_CURRENT_DATA || !v.videoWidth || !v.videoHeight) {
+      toast("Kamera belum siap. Tunggu sampai pratinjau muncul, lalu coba lagi.");
+      return;
+    }
+    const activeRun = ++runId.current;
     setBusy(true);
     S.shots = [];
     setDone(0);
-    for (let i = 0; i < L().n; i++) {
-      for (let t = S.timer; t > 0; t--) {
-        setCd(String(t));
-        await sleep(1000);
+    try {
+      for (let i = 0; i < L().n; i++) {
+        for (let t = S.timer; t > 0; t--) {
+          if (runId.current !== activeRun) return;
+          setCd(String(t));
+          await sleep(1000);
+        }
+        if (runId.current !== activeRun) return;
+        if (!v.videoWidth || !v.videoHeight || v.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+          throw new Error("Kamera terputus sebelum semua foto diambil.");
+        }
+        setCd("");
+        setFlash((f) => f + 1);
+        S.shots.push(toCell(v, v.videoWidth, v.videoHeight, S.facing === "user"));
+        setDone(i + 1);
+        await sleep(700);
       }
-      setCd("");
-      setFlash((f) => f + 1);
-      S.shots.push(toCell(v, v.videoWidth, v.videoHeight, S.facing === "user"));
-      setDone(i + 1);
-      await sleep(700);
+      stop();
+      go("res");
+    } catch (error) {
+      S.shots = [];
+      toast(error instanceof Error ? error.message : "Gagal mengambil foto. Coba buka kamera kembali.");
+    } finally {
+      if (runId.current === activeRun) {
+        setBusy(false);
+        setCd("");
+      }
     }
-    setBusy(false);
-    stop();
-    go("res");
   }
 
   async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const fs = Array.from(e.target.files || []).slice(0, L().n);
-    if (!fs.length) return;
-    const cells = await Promise.all(
-      fs.map(
-        (f) =>
-          new Promise<HTMLCanvasElement>((r) => {
-            const i = new Image();
-            i.onload = () => r(toCell(i, i.naturalWidth, i.naturalHeight, false));
-            i.src = URL.createObjectURL(f);
-          })
-      )
-    );
-    S.shots = Array.from({ length: L().n }, (_, i) => cells[i % cells.length]);
-    e.target.value = "";
-    go("res");
-    if (cells.length < L().n) toast("Foto kurang dari " + L().n + ", jadi ada yang diulang.");
+    const input = e.currentTarget;
+    const selected = Array.from(input.files || []);
+    input.value = "";
+    if (!selected.length) return;
+    const allowed = selected.filter((f) => f.type.startsWith("image/"));
+    if (allowed.length !== selected.length) toast("Beberapa file dilewati karena bukan file gambar.");
+    const tooLarge = allowed.filter((f) => f.size > 15 * 1024 * 1024);
+    if (tooLarge.length) toast("Foto berukuran lebih dari 15 MB dilewati agar browser tetap ringan.");
+    const files = allowed.filter((f) => f.size <= 15 * 1024 * 1024).slice(0, L().n);
+    if (!files.length) {
+      toast("Pilih file gambar yang valid dengan ukuran maksimal 15 MB per foto.");
+      return;
+    }
+    setImporting(true);
+    try {
+      const results = await Promise.all(files.map((f) => new Promise<HTMLCanvasElement>((resolve, reject) => {
+        const url = URL.createObjectURL(f);
+        const img = new Image();
+        img.onload = () => {
+          try {
+            if (!img.naturalWidth || !img.naturalHeight) throw new Error("Gambar kosong atau rusak.");
+            resolve(toCell(img, img.naturalWidth, img.naturalHeight, false));
+          } catch (error) {
+            reject(error);
+          } finally {
+            URL.revokeObjectURL(url);
+          }
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(url);
+          reject(new Error("Salah satu foto tidak dapat dibaca."));
+        };
+        img.src = url;
+      })));
+      if (!results.length) throw new Error("Tidak ada foto yang berhasil dibaca.");
+      S.shots = Array.from({ length: L().n }, (_, i) => results[i % results.length]);
+      go("res");
+      if (results.length < L().n) toast("Foto kurang dari " + L().n + ", jadi beberapa posisi menggunakan foto yang sama.");
+    } catch (error) {
+      toast(error instanceof Error ? error.message : "Gagal membaca foto. Coba pilih gambar lain.");
+    } finally {
+      setImporting(false);
+    }
   }
 
   function save() {
@@ -170,12 +236,14 @@ export default function Photobooth() {
         }
       }
       const a = document.createElement("a");
-      a.href = URL.createObjectURL(b);
+      const url = URL.createObjectURL(b);
+      a.href = url;
       a.download = "pojok-foto.png";
       document.body.append(a);
       a.click();
       a.remove();
-      toast("Jika tidak terunduh, buka lewat browser biasa.");
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      toast("Jika unduhan tidak dimulai, gunakan browser biasa dan coba lagi.");
     }, "image/png");
   }
 
@@ -271,7 +339,7 @@ export default function Photobooth() {
               </div>
               <div className="stack">
                 <button className="cta" onClick={openCam}>Masuk ke bilik</button>
-                <button className="ghost" onClick={() => file.current?.click()}>Pilih dari galeri</button>
+                <button className="ghost" disabled={importing} onClick={() => file.current?.click()}>{importing ? "Membaca foto..." : "Pilih dari galeri"}</button>
                 <input ref={file} type="file" accept="image/*" multiple hidden onChange={onFile} />
               </div>
             </div>
