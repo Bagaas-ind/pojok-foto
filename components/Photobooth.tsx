@@ -126,6 +126,10 @@ export default function Photobooth() {
         audio: false,
       });
       stream.current = nextStream;
+      nextStream.getVideoTracks()[0]?.addEventListener("ended", () => {
+        setCameraReady(false);
+        toast("Koneksi kamera terputus. Buka kamera kembali untuk melanjutkan.");
+      }, { once: true });
       setDone(0);
       setCameraVersion((version) => version + 1);
       go("cam");
